@@ -1,0 +1,30 @@
+name: flutter_google_maps_clusters
+description: An example showing how to cluster markers on Google Maps.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Icon package for iOS
+  cupertino_icons: ^0.1.2
+
+  # Google maps
+  google_maps_flutter: ^0.5.21+3
+
+  # Map markers clustering
+  fluster: ^1.1.2
+
+  # Cache manager
+  flutter_cache_manager: ^1.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
