@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:fluster/fluster.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_maps_clusters/helpers/map_utils.dart';
+import 'package:flutter_google_maps_clusters/helpers/map_marker.dart';
+import 'package:flutter_google_maps_clusters/helpers/map_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,8 +14,20 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> _mapController = Completer();
 
-  /// Set of displayed markers on the map
+  /// Set of displayed markers and cluster markers on the map
   final Set<Marker> _markers = Set();
+
+  /// Minimum zoom at which the markers will cluster
+  final int _minClusterZoom = 0;
+
+  /// Maximum zoom at which the markers will cluster
+  final int _maxClusterZoom = 19;
+
+  /// [Fluster] instance used to manage the clusters
+  Fluster<MapMarker> _clusterManager;
+
+  /// Current map zoom. Initial zoom will be 15, street level
+  double _currentZoom = 15;
 
   /// Map loading flag
   bool _isMapLoading = true;
@@ -21,12 +35,15 @@ class _HomePageState extends State<HomePage> {
   /// Markers loading flag
   bool _areMarkersLoading = true;
 
-  final String _markerImageUrl1 =
+  /// Url image used on normal markers
+  final String _markerImageUrl =
       'https://img.icons8.com/office/80/000000/marker.png';
-  final String _markerImageUrl2 =
-      'https://img.icons8.com/ultraviolet/80/000000/marker.png';
 
-  /// A list of a predefined marker locations around Porto
+  /// Url image used on cluster markers
+  final String _clusterImageUrl =
+      'https://img.icons8.com/officel/80/000000/place-marker.png';
+
+  /// Example marker coordinates
   final List<LatLng> _markerLocations = [
     LatLng(41.147125, -8.611249),
     LatLng(41.145599, -8.610691),
@@ -52,25 +69,49 @@ class _HomePageState extends State<HomePage> {
     _initMarkers();
   }
 
-  /// Inits all the markers with network images and updates the loading state.
+  /// Inits [Fluster] and all the markers with network images and updates the loading state.
   void _initMarkers() async {
+    final List<MapMarker> markers = [];
+
     for (LatLng markerLocation in _markerLocations) {
-      final int markerIndex = _markerLocations.indexOf(markerLocation);
-
-      final String markerImageUrl =
-          markerIndex < 5 ? _markerImageUrl1 : _markerImageUrl2;
-
       final BitmapDescriptor markerImage =
-          await MapHelper.getMarkerImageFromUrl(markerImageUrl);
+          await MapHelper.getMarkerImageFromUrl(_markerImageUrl);
 
-      _markers.add(
-        Marker(
-          markerId: MarkerId(markerIndex.toString()),
+      markers.add(
+        MapMarker(
+          id: _markerLocations.indexOf(markerLocation).toString(),
           position: markerLocation,
           icon: markerImage,
         ),
       );
     }
+
+    _clusterManager = await MapHelper.initClusterManager(
+      markers,
+      _minClusterZoom,
+      _maxClusterZoom,
+      _clusterImageUrl,
+    );
+
+    _updateMarkers();
+  }
+
+  /// Gets the markers and clusters to be displayed on the map for the current zoom level and
+  /// updates state.
+  void _updateMarkers([double updatedZoom]) {
+    if (_clusterManager == null || updatedZoom == _currentZoom) return;
+
+    if (updatedZoom != null) {
+      _currentZoom = updatedZoom;
+    }
+
+    setState(() {
+      _areMarkersLoading = true;
+    });
+
+    _markers
+      ..clear()
+      ..addAll(MapHelper.getClusterMarkers(_clusterManager, _currentZoom));
 
     setState(() {
       _areMarkersLoading = false;
@@ -85,23 +126,28 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Stack(
         children: <Widget>[
+          // Google Map widget
           Opacity(
             opacity: _isMapLoading ? 0 : 1,
             child: GoogleMap(
               mapToolbarEnabled: false,
-              compassEnabled: true,
               initialCameraPosition: CameraPosition(
                 target: LatLng(41.143029, -8.611274),
-                zoom: 15,
+                zoom: _currentZoom,
               ),
               markers: _markers,
               onMapCreated: (controller) => _onMapCreated(controller),
+              onCameraMove: (position) => _updateMarkers(position.zoom),
             ),
           ),
+
+          // Map loading indicator
           Opacity(
             opacity: _isMapLoading ? 1 : 0,
             child: Center(child: CircularProgressIndicator()),
           ),
+
+          // Map markers loading indicator
           if (_areMarkersLoading)
             Padding(
               padding: const EdgeInsets.all(8.0),
