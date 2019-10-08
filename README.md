@@ -1,6 +1,6 @@
 # Marker Clustering and Marker Network Image Icons on [Flutter](https://flutter.dev/) Google Maps
 
-This example project serves as a companion to the [Use Network Images as Marker Icons on Flutter Google Maps](https://coletiv.com/blog/use-network-images-as-marker-icons-flutter-google-maps/) blog post.
+This example project serves as a companion to the [Use Network Images as Marker Icons on Flutter Google Maps](https://coletiv.com/blog/use-network-images-as-marker-icons-flutter-google-maps/) and [How to Cluster Markers on Flutter using Google Maps](https://coletiv.com/blog/how-to-cluster-markers-on-google-maps-using-flutter/) blog posts.
 
 It shows how to get an image from an url and use it as a marker icon and how to cluster markers on [Google Maps For Flutter](https://pub.dev/packages/google_maps_flutter).
 
