@@ -39,9 +39,11 @@ class _HomePageState extends State<HomePage> {
   final String _markerImageUrl =
       'https://img.icons8.com/office/80/000000/marker.png';
 
-  /// Url image used on cluster markers
-  final String _clusterImageUrl =
-      'https://img.icons8.com/officel/80/000000/place-marker.png';
+  /// Color of the cluster circle
+  final Color _clusterColor = Colors.blue;
+
+  /// Color of the cluster text
+  final Color _clusterTextColor = Colors.white;
 
   /// Example marker coordinates
   final List<LatLng> _markerLocations = [
@@ -90,15 +92,14 @@ class _HomePageState extends State<HomePage> {
       markers,
       _minClusterZoom,
       _maxClusterZoom,
-      _clusterImageUrl,
     );
 
-    _updateMarkers();
+    await _updateMarkers();
   }
 
   /// Gets the markers and clusters to be displayed on the map for the current zoom level and
   /// updates state.
-  void _updateMarkers([double updatedZoom]) {
+  Future<void> _updateMarkers([double updatedZoom]) async {
     if (_clusterManager == null || updatedZoom == _currentZoom) return;
 
     if (updatedZoom != null) {
@@ -109,9 +110,17 @@ class _HomePageState extends State<HomePage> {
       _areMarkersLoading = true;
     });
 
+    final updatedMarkers = await MapHelper.getClusterMarkers(
+      _clusterManager,
+      _currentZoom,
+      _clusterColor,
+      _clusterTextColor,
+      80,
+    );
+
     _markers
       ..clear()
-      ..addAll(MapHelper.getClusterMarkers(_clusterManager, _currentZoom));
+      ..addAll(updatedMarkers);
 
     setState(() {
       _areMarkersLoading = false;
