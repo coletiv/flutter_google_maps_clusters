@@ -32,7 +32,7 @@ class MapMarker extends Clusterable {
         );
 
   Marker toMarker() => Marker(
-        markerId: MarkerId(id),
+        markerId: MarkerId(isCluster ? 'cl_$id' : id),
         position: LatLng(
           position.latitude,
           position.longitude,
