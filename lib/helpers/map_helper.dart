@@ -145,7 +145,7 @@ class MapHelper {
           MapMarker(
         id: cluster.id.toString(),
         position: LatLng(lat, lng),
-        isCluster: true,
+        isCluster: cluster.isCluster,
         clusterId: cluster.id,
         pointsSize: cluster.pointsSize,
         childMarkerId: cluster.childMarkerId,
