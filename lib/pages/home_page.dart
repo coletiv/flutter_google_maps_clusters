@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:fluster/fluster.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_maps_clusters/helpers/map_marker.dart';
 import 'package:flutter_google_maps_clusters/helpers/map_helper.dart';
+import 'package:flutter_google_maps_clusters/helpers/map_marker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class HomePage extends StatefulWidget {
@@ -139,7 +139,11 @@ class _HomePageState extends State<HomePage> {
           Opacity(
             opacity: _isMapLoading ? 0 : 1,
             child: GoogleMap(
-              mapToolbarEnabled: false,
+              mapToolbarEnabled: true,
+              zoomGesturesEnabled: true,
+              myLocationButtonEnabled: true,
+              myLocationEnabled: true,
+              zoomControlsEnabled: true,
               initialCameraPosition: CameraPosition(
                 target: LatLng(41.143029, -8.611274),
                 zoom: _currentZoom,
