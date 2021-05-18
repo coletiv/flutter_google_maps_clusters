@@ -22,10 +22,8 @@ class MapHelper {
   /// You can resize the marker image by providing a [targetWidth].
   static Future<BitmapDescriptor> getMarkerImageFromUrl(
     String url, {
-    int targetWidth,
+    int? targetWidth,
   }) async {
-    assert(url != null);
-
     final File markerImageFile = await DefaultCacheManager().getSingleFile(url);
 
     Uint8List markerImageBytes = await markerImageFile.readAsBytes();
@@ -50,10 +48,6 @@ class MapHelper {
     Color textColor,
     int width,
   ) async {
-    assert(clusterSize != null);
-    assert(clusterColor != null);
-    assert(width != null);
-
     final PictureRecorder pictureRecorder = PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
     final Paint paint = Paint()..color = clusterColor;
@@ -88,7 +82,9 @@ class MapHelper {
           radius.toInt() * 2,
           radius.toInt() * 2,
         );
-    final data = await image.toByteData(format: ImageByteFormat.png);
+    final data = await (image.toByteData(
+      format: ImageByteFormat.png,
+    ) as FutureOr<ByteData>);
 
     return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
   }
@@ -100,9 +96,6 @@ class MapHelper {
     Uint8List imageBytes,
     int targetWidth,
   ) async {
-    assert(imageBytes != null);
-    assert(targetWidth != null);
-
     final Codec imageCodec = await instantiateImageCodec(
       imageBytes,
       targetWidth: targetWidth,
@@ -110,9 +103,9 @@ class MapHelper {
 
     final FrameInfo frameInfo = await imageCodec.getNextFrame();
 
-    final ByteData byteData = await frameInfo.image.toByteData(
+    final ByteData byteData = await (frameInfo.image.toByteData(
       format: ImageByteFormat.png,
-    );
+    ) as FutureOr<ByteData>);
 
     return byteData.buffer.asUint8List();
   }
@@ -126,10 +119,6 @@ class MapHelper {
     int minZoom,
     int maxZoom,
   ) async {
-    assert(markers != null);
-    assert(minZoom != null);
-    assert(maxZoom != null);
-
     return Fluster<MapMarker>(
       minZoom: minZoom,
       maxZoom: maxZoom,
@@ -156,24 +145,21 @@ class MapHelper {
   /// Gets a list of markers and clusters that reside within the visible bounding box for
   /// the given [currentZoom]. For more info check [Fluster.clusters].
   static Future<List<Marker>> getClusterMarkers(
-    Fluster<MapMarker> clusterManager,
+    Fluster<MapMarker>? clusterManager,
     double currentZoom,
     Color clusterColor,
     Color clusterTextColor,
     int clusterWidth,
   ) {
-    assert(currentZoom != null);
-    assert(clusterColor != null);
-    assert(clusterTextColor != null);
-    assert(clusterWidth != null);
-
     if (clusterManager == null) return Future.value([]);
 
     return Future.wait(clusterManager.clusters(
-        [-180, -85, 180, 85], currentZoom.toInt()).map((mapMarker) async {
-      if (mapMarker.isCluster) {
+      [-180, -85, 180, 85],
+      currentZoom.toInt(),
+    ).map((mapMarker) async {
+      if (mapMarker.isCluster!) {
         mapMarker.icon = await _getClusterMarker(
-          mapMarker.pointsSize,
+          mapMarker.pointsSize!,
           clusterColor,
           clusterTextColor,
           clusterWidth,

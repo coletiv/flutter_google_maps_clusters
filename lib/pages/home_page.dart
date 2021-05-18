@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   final int _maxClusterZoom = 19;
 
   /// [Fluster] instance used to manage the clusters
-  Fluster<MapMarker> _clusterManager;
+  Fluster<MapMarker>? _clusterManager;
 
   /// Current map zoom. Initial zoom will be 15, street level
   double _currentZoom = 15;
@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
 
   /// Gets the markers and clusters to be displayed on the map for the current zoom level and
   /// updates state.
-  Future<void> _updateMarkers([double updatedZoom]) async {
+  Future<void> _updateMarkers([double? updatedZoom]) async {
     if (_clusterManager == null || updatedZoom == _currentZoom) return;
 
     if (updatedZoom != null) {
