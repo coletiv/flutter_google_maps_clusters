@@ -11,16 +11,13 @@ dependencies:
     sdk: flutter
 
   # Google maps
-  google_maps_flutter: ^2.0.4
+  google_maps_flutter: ^2.0.5
 
   # Map markers clustering
   fluster: ^1.2.0
 
   # Cache manager
   flutter_cache_manager: ^3.0.2
-
-  # Icon package for iOS
-  cupertino_icons: ^1.0.3
 
 dev_dependencies:
   flutter_test:
