@@ -82,11 +82,9 @@ class MapHelper {
           radius.toInt() * 2,
           radius.toInt() * 2,
         );
-    final data = await (image.toByteData(
-      format: ImageByteFormat.png,
-    ) as FutureOr<ByteData>);
+    final data = await image.toByteData(format: ImageByteFormat.png);
 
-    return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
+    return BitmapDescriptor.fromBytes(data!.buffer.asUint8List());
   }
 
   /// Resizes the given [imageBytes] with the [targetWidth].
@@ -103,11 +101,9 @@ class MapHelper {
 
     final FrameInfo frameInfo = await imageCodec.getNextFrame();
 
-    final ByteData byteData = await (frameInfo.image.toByteData(
-      format: ImageByteFormat.png,
-    ) as FutureOr<ByteData>);
+    final data = await frameInfo.image.toByteData(format: ImageByteFormat.png);
 
-    return byteData.buffer.asUint8List();
+    return data!.buffer.asUint8List();
   }
 
   /// Inits the cluster manager with all the [MapMarker] to be displayed on the map.
@@ -127,13 +123,13 @@ class MapHelper {
       nodeSize: 64,
       points: markers,
       createCluster: (
-        BaseCluster cluster,
-        double lng,
-        double lat,
+        BaseCluster? cluster,
+        double? lng,
+        double? lat,
       ) =>
           MapMarker(
-        id: cluster.id.toString(),
-        position: LatLng(lat, lng),
+        id: cluster!.id.toString(),
+        position: LatLng(lat!, lng!),
         isCluster: cluster.isCluster,
         clusterId: cluster.id,
         pointsSize: cluster.pointsSize,
